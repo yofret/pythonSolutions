@@ -70,7 +70,6 @@ def get_tuple(tuple):
 
 def print_top(filename):
     wordcount = wordcounter(filename)
-
     sortedwordcount = sorted(wordcount.items(), key=get_tuple, reverse=True)[:20]
 
     for count in sortedwordcount:
