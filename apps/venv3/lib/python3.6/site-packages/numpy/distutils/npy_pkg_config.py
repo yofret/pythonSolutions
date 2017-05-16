@@ -5,14 +5,14 @@ import re
 import os
 
 if sys.version_info[0] < 3:
-    from ConfigParser import RawConfigParser, NoOptionError
+    from ConfigParser import SafeConfigParser, NoOptionError
 else:
-    from configparser import RawConfigParser, NoOptionError
+    from configparser import ConfigParser, SafeConfigParser, NoOptionError
 
 __all__ = ['FormatError', 'PkgNotFound', 'LibraryInfo', 'VariableSet',
         'read_config', 'parse_flags']
 
-_VAR = re.compile(r'\$\{([a-zA-Z0-9_-]+)\}')
+_VAR = re.compile('\$\{([a-zA-Z0-9_-]+)\}')
 
 class FormatError(IOError):
     """
@@ -259,7 +259,11 @@ def parse_config(filename, dirs=None):
     else:
         filenames = [filename]
 
-    config = RawConfigParser()
+    if sys.version[:3] > '3.1':
+        # SafeConfigParser is deprecated in py-3.2 and renamed to ConfigParser
+        config = ConfigParser()
+    else:
+        config = SafeConfigParser()
 
     n = config.read(filenames)
     if not len(n) >= 1:
@@ -427,7 +431,7 @@ if __name__ == '__main__':
         section = "default"
 
     if options.define_variable:
-        m = re.search(r'([\S]+)=([\S]+)', options.define_variable)
+        m = re.search('([\S]+)=([\S]+)', options.define_variable)
         if not m:
             raise ValueError("--define-variable option should be of " \
                              "the form --define-variable=foo=bar")
